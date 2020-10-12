@@ -1,95 +1,103 @@
+//SPDX-License-Identifier: Apache-2.0
+
+// Import dependencies
+// Import the chaincode shim package and the peer protobuf package
+
+/*  This code is based on code written by the Hyperledger Fabric community.
+  Original code can be found here: https://github.com/hyperledger/fabric-samples/blob/release/chaincode/chaincode_example02/chaincode_example02.go
+ */
+
 package main
 
 import (
-	"fmt"
+    "fmt"
 
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"github.com/hyperledger/fabric/protos/peer"
-	"time"
-	"encoding/json"
+    "github.com/hyperledger/fabric/core/chaincode/shim"
+    "github.com/hyperledger/fabric/protos/peer"
 )
 
-type ApartementRegister struct {
+// SampleChaincode implements a simple chaincode to manage an asset
+type SampleChaincode struct {
+
 }
 
-type Renter struct {
-	name    string
-	surname string
-	movedIn time.Time
+// Init is called during chaincode instantiation to initialize
+// data. We'll be adding more in this function later on.
+func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
+    // Get the args from the transaction proposal
+    args := stub.GetStringArgs()
+    if len(args) != 2 {
+        return shim.Error("Incorrect arguments. Expecting a key and a value")
+    }
+
+    // Set up any variables or assets here by calling stub.PutState()
+
+    // We store the key and the value on the ledger
+    err := stub.PutState(args[0], []byte(args[1]))
+    if err != nil {
+        return shim.Error(fmt.Sprintf("Failed to create asset: %s", args[0]))
+    }
+    return shim.Success(nil)
 }
 
-type Block struct {
-	id       string
-	street   string
-	number   string
-	renters  []Renter
-	nOfRooms string
+// Invoke is called per transaction on the chaincode. Each transaction is
+// either a 'get' or a 'set' on the asset created by Init function. The Set
+// method may create a new asset by specifying a new key-value pair.
+func (t *SampleChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
+    // Extract the function and args from the transaction proposal
+    fn, args := stub.GetFunctionAndParameters()
+
+    var result string
+    var err error
+    if fn == "set" {
+        result, err = set(stub, args)
+    } else { // assume 'get' even if fn is nil
+        result, err = get(stub, args)
+    }
+    if err != nil {
+        return shim.Error(err.Error())
+    }
+
+    // Return the result as success payload
+    return shim.Success([]byte(result))
 }
 
-//cache of blocks id
-var blocks map[string]bool
+// Set stores the asset (both key and value) on the ledger. If the key exists,
+// it will override the value with the new one
+func set(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+    if len(args) != 2 {
+        return "", fmt.Errorf("Incorrect arguments. Expecting a key and a value")
+    }
 
-func createId(street string, number string) string {
-	return fmt.Sprintf("%s%d", street, number)
+    err := stub.PutState(args[0], []byte(args[1]))
+    if err != nil {
+        return "", fmt.Errorf("Failed to set asset: %s", args[0])
+    }
+    return args[1], nil
 }
 
-//retrieve a block on the ledger
-func getBlock(stub shim.ChaincodeStubInterface, key string) (*Block, error) {
-	var block Block
-	block_marshalled, err := stub.GetState(key)
-	err = json.Unmarshal(block_marshalled, &block)
-	return &block, err
+// Get returns the value of the specified asset key
+func get(stub shim.ChaincodeStubInterface, args []string) (string, error) {
+    if len(args) != 1 {
+        return "", fmt.Errorf("Incorrect arguments. Expecting a key")
+    }
+
+    value, err := stub.GetState(args[0])
+    if err != nil {
+        return "", fmt.Errorf("Failed to get asset: %s with error: %s", args[0], err)
+    }
+    if value == nil {
+        return "", fmt.Errorf("Asset not found: %s", args[0])
+    }
+    return string(value), nil
 }
 
-//save a block on the ledger
-func putBlock(stub shim.ChaincodeStubInterface, key string, block *Block) error {
-	block_marshalled, _ := json.Marshal(*block)
-	return stub.PutState(key, block_marshalled)
-}
-
-
-
-//Initialisation of the Chaincode
-func (m *ApartementRegister) Init(stub shim.ChaincodeStubInterface) peer.Response {
-	blocks = make(map[string]bool)
-	return shim.Success([]byte("Successfully initialized Chaincode."))
-}
-
-//Entry Point of an invocation
-func (m *ApartementRegister) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
-	function, para := stub.GetFunctionAndParameters()
-
-	switch(function) {
-	case "queryRenter":
-		if len(para) < 3 {
-			return shim.Error("not enough arguments for queryRenter. 3 required")
-		} else {
-			return queryRenter(stub, para[0], para[1], para[2])
-		}
-	case "registerRenter":
-		if len(para) < 3 {
-			return shim.Error("not enough arguments for registerRenter. 4 required")
-		} else {
-			return registerNewRenter(stub, para[0], para[1], para[2], para[3])
-		}
-	case "newBlock":
-		return newBlock(stub, para[0], para[1], para[2])
-	case "blocksCount":
-		return blocksCount()
-	case "rentersCount":
-		if len(para) < 2 {
-			return shim.Error("not enough arguments for rentersCount. 2 required")
-		} else {
-			return rentersCount(stub, para[0], para[1])
-		}
-	case "findEmptyBlock":
-		return findEmptyBlock(stub)
-	}
-	return shim.Error(fmt.Sprintf("No function %s implemented", function))
-}
-
+// main function starts up the chaincode in the container during instantiate
 func main() {
-	if err := shim.Start(new(ApartementRegister)); err != nil {
-		fmt.Printf("Error starting SimpleAsset chaincode: %s", err)
-	}
+    err := shim.Start(new(SampleChaincode))
+    if err != nil {
+        fmt.Println("Could not start SampleChaincode")
+    } else {
+        fmt.Println("SampleChaincode successfully started")
+    }
 }
