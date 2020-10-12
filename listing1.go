@@ -39,7 +39,7 @@ func listing1() {
 	sel := rand.Intn(10)
 
 	if pred == sel {
-		PayPrizeToUser(user, prize)
+		// PayPrizeToUser(user, prize)
 	}
 }
 
