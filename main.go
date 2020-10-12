@@ -27,18 +27,6 @@ func (cc *Chaincode) Invoke(stub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Success(nil)
 }
 
-func listing1() {
-	// User predicts a number
-	pred := arg[0]
-
-	// Answer
-	rand.Seed(seed)
-	sel := rand.Intn(10)
-
-	if pred == sel {
-		// PayPrizeToUser(user, prize)
-	}
-}
 
 func main() {
 	err := shim.Start(new(Chaincode))
