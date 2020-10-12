@@ -6,10 +6,11 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	sc "github.com/hyperledger/fabric/protos/peer"
+	"github.com/hyperledger/fabric/protos/peer"
+	"time"
+	"encoding/json"
 )
 
 type Chaincode struct {
