@@ -102,4 +102,13 @@ func main() {
         fmt.Println("SampleChaincode successfully started")
     }
 	
+// listing 1
+     // User predicts a number
+     pred := arg[0]
+     // Answer
+     rand.Seed(seed)
+     sel := rand.Intn(10)
+     if pred == sel {
+     // PayPrizeToUser(user, prize)
+     }
 }
