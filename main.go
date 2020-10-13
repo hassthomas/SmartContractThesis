@@ -112,4 +112,6 @@ func main() {
     } else {
         fmt.Println("SampleChaincode successfully started")
     }
+	
+	listing1();
 }
