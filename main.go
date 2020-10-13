@@ -20,12 +20,13 @@ import (
 type SampleChaincode struct {
 }
 
-var globalVariable map[string]bool
+var globalVariable int
 
 // Init is called during chaincode instantiation to initialize
 // data. We'll be adding more in this function later on.
 func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
     // Get the args from the transaction proposal
+    globalVariable = 5
     args := stub.GetStringArgs()
     if len(args) != 2 {
         return shim.Error("Incorrect arguments. Expecting a key and a value")
