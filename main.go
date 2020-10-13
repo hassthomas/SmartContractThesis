@@ -21,6 +21,17 @@ type SampleChaincode struct {
 
 }
 
+// LISTING 4
+type BadChaincode struct {
+  globalValue string // this is a risk
+}
+
+func (t *BadChaincode) Invoke (stub shim, ChaincodeStubInterface) peer.Response {
+  t.globalValue = args[0]
+  return shim.Success([] byte("success"))
+}
+
+
 // Init is called during chaincode instantiation to initialize
 // data. We'll be adding more in this function later on.
 func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
