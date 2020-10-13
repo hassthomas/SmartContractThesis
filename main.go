@@ -11,22 +11,20 @@ package main
 
 import (
     "fmt"
-    "time"
     "github.com/hyperledger/fabric/core/chaincode/shim"
     "github.com/hyperledger/fabric/protos/peer"
+    "time"
 )
+var globalVariable int
 
 // SampleChaincode implements a simple chaincode to manage an asset
 type SampleChaincode struct {
 }
 
-var globalVariable int
-
 // Init is called during chaincode instantiation to initialize
 // data. We'll be adding more in this function later on.
 func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
     // Get the args from the transaction proposal
-    globalVariable = 5
     args := stub.GetStringArgs()
     if len(args) != 2 {
         return shim.Error("Incorrect arguments. Expecting a key and a value")
@@ -104,6 +102,6 @@ func main() {
     } else {
         fmt.Println("SampleChaincode successfully started")
     }
-
+    globalVariable = 5
 	
 }
