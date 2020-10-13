@@ -93,9 +93,6 @@ func get(stub shim.ChaincodeStubInterface, args []string) (string, error) {
     return string(value), nil
 }
 
-func UncheckedInput() {
-	ret, err := stub.GetState(args[0]) // Unchecked Input Arguments
-}
 
 // main function starts up the chaincode in the container during instantiate
 func main() {
@@ -106,6 +103,5 @@ func main() {
         fmt.Println("SampleChaincode successfully started")
     }
 
-	UncheckedInput()
 	
 }
