@@ -18,17 +18,7 @@ import (
 
 // SampleChaincode implements a simple chaincode to manage an asset
 type SampleChaincode struct {
-
-}
-
-// LISTING 4
-type BadChaincode struct {
-  globalValue string // this is a risk
-}
-
-func (t *BadChaincode) Invoke (stub shim, ChaincodeStubInterface) peer.Response {
-  t.globalValue = args[0]
-  return shim.Success([] byte("success"))
+	globalValue string // this is a risk (LISTING 2)
 }
 
 
@@ -55,6 +45,8 @@ func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
 // either a 'get' or a 'set' on the asset created by Init function. The Set
 // method may create a new asset by specifying a new key-value pair.
 func (t *SampleChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
+	
+    t.globalValue = args[0]
     // Extract the function and args from the transaction proposal
     fn, args := stub.GetFunctionAndParameters()
 
@@ -102,8 +94,7 @@ func get(stub shim.ChaincodeStubInterface, args []string) (string, error) {
     }
     return string(value), nil
 }
-func listing1() {
-}
+
 
 // main function starts up the chaincode in the container during instantiate
 func main() {
@@ -114,5 +105,4 @@ func main() {
         fmt.Println("SampleChaincode successfully started")
     }
 	
-	listing1()
 }
