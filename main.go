@@ -20,6 +20,7 @@ import (
 type SampleChaincode struct {
 }
 
+var globalVariable map[string]bool
 
 // Init is called during chaincode instantiation to initialize
 // data. We'll be adding more in this function later on.
