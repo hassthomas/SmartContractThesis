@@ -91,18 +91,7 @@ func get(stub shim.ChaincodeStubInterface, args []string) (string, error) {
     }
     return string(value), nil
 }
-
-func listing1() {
-	// User predicts a number
-	pred := arg[0]
-	// Answer
-	rand.Seed(seed)
-	sel := rand.Intn(10)
-	if pred == sel {
-		// PayPrizeToUser(user, prize)
-		}
 	
-	}	
 
 // main function starts up the chaincode in the container during instantiate
 func main() {
@@ -113,5 +102,4 @@ func main() {
         fmt.Println("SampleChaincode successfully started")
     }
 	
-	listing1();
 }
